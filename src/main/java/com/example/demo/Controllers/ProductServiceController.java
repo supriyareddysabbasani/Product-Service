@@ -25,7 +25,7 @@ public class ProductServiceController {
 }
 
     @GetMapping("/products/{id}")
-    public Product getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
+    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) throws ProductNotFoundException {
        return productService.getProductById(id);
     }
     @GetMapping("/products")
@@ -72,31 +72,6 @@ public class ProductServiceController {
 
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ErrorDTO> handleNPException(){
-        ErrorDTO errorDTO = new ErrorDTO();
-        errorDTO.setMessage("Product Not Found");
 
-        ResponseEntity<ErrorDTO> responseEntity = new ResponseEntity(errorDTO, HttpStatusCode.valueOf(404));
-        return responseEntity;
-    }
-
-//    @ExceptionHandler(ProductNotFoundException.class)
-//    public ResponseEntity<ErrorDTO> handlePNFException(){
-//        ErrorDTO errorDTO = new ErrorDTO();
-//        errorDTO.setMessage("Product Not Found in get");
-//
-//        ResponseEntity<ErrorDTO> responseEntity = new ResponseEntity(errorDTO, HttpStatusCode.valueOf(404));
-//        return responseEntity;
-//    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDTO> handleException(){
-        ErrorDTO errorDTO = new ErrorDTO();
-        errorDTO.setMessage("Somting went wrong");
-
-        ResponseEntity<ErrorDTO> responseEntity = new ResponseEntity(errorDTO, HttpStatusCode.valueOf(500));
-        return responseEntity;
-    }
 
 }

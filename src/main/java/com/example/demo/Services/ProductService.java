@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductService {
 
-   public Product getProductById(Long id) throws ProductNotFoundException;
+   public ResponseEntity<Product> getProductById(Long id) throws ProductNotFoundException;
 
    public List<Product> getAllProducts();
 

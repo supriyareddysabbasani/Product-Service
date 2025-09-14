@@ -21,17 +21,18 @@ public class FakeStoreAPIService implements ProductService {
     private RestTemplate restTemplate;
 
     public FakeStoreAPIService(RestTemplate restTemplate) {
+
         this.restTemplate = restTemplate;
     }
 
     @Override
-    public Product getProductById(Long id) throws ProductNotFoundException {
+    public ResponseEntity<Product> getProductById(Long id) throws ProductNotFoundException {
         FakeStoreAPIResponseDTO responseDTO = restTemplate.getForObject("https://fakestoreapi.com/products/" + id, FakeStoreAPIResponseDTO.class);
 
         if(responseDTO == null){
            throw new ProductNotFoundException("Product Not Found Exception");
         }
-        return responseDTO.toProduct();
+        return getProductById(id);
     }
 
 

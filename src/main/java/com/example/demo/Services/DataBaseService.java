@@ -5,7 +5,8 @@ import com.example.demo.models.Category;
 import com.example.demo.models.Product;
 import com.example.demo.repositories.CategoryRepository;
 import com.example.demo.repositories.ProductRepository;
-import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,17 +18,31 @@ public class DataBaseService implements ProductService{
 
     private ProductRepository productRepository;
     private CategoryRepository categoryRepository;
+    private RedisTemplate<String, Object> redisTemplate;
 
-    public DataBaseService(ProductRepository productRepository, CategoryRepository categoryRepository){
+    public DataBaseService(ProductRepository productRepository, CategoryRepository categoryRepository, RedisTemplate<String, Object> redisTemplate){
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
-    public Product getProductById(Long id) throws ProductNotFoundException {
-       Optional<Product> productOptional = productRepository.findById(id);
+    public ResponseEntity<Product> getProductById(Long id) throws ProductNotFoundException {
+
+        Product productFromRedis = (Product) redisTemplate.opsForValue().get(String.valueOf(id));
+
+        if(productFromRedis != null) {
+
+            return new ResponseEntity<Product>(productFromRedis, HttpStatusCode.valueOf(200));
+        }
+
+        Optional<Product> productOptional = productRepository.findById(id);
+
+
+
        if(productOptional.isPresent()){
-           return productOptional.get();
+           redisTemplate.opsForValue().set(String.valueOf(id), productOptional.get());
+           return ResponseEntity.ok(productOptional.get());
        }
        throw new ProductNotFoundException("Product not found");
     }
